@@ -1,5 +1,7 @@
 package com.example.oauth2jwt.config;
 
+import com.example.oauth2jwt.JwtUtil;
+import com.example.oauth2jwt.oauth2.CustomSuccessHandler;
 import com.example.oauth2jwt.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +21,8 @@ import static org.springframework.security.config.http.SessionCreationPolicy.*;
 public class SecurityConfig {
 
     private final CustomOAuth2UserService userService;
+    private final CustomSuccessHandler customSuccessHandler;
+    private final JwtUtil jwtUtil;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,7 +36,9 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable);
         http
                 .oauth2Login(httpSecurityOAuth2LoginConfigurer -> httpSecurityOAuth2LoginConfigurer
-                        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(userService)));
+                        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(userService))
+                        .successHandler(customSuccessHandler)
+                );
 
         // 글로벌 인가 작업
         http
