@@ -1,6 +1,6 @@
 package com.example.oauth2jwt.oauth2;
 
-import com.example.oauth2jwt.JwtUtil;
+import com.example.oauth2jwt.jwt.JwtUtil;
 import com.example.oauth2jwt.dto.CustomOAuth2User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,8 +8,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +17,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
@@ -28,9 +29,11 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String username = customUserDetails.getUsername();
 
+        log.info("username = {}", username);
+
         String role = authentication.getAuthorities().iterator().next().getAuthority();
 
-        String token = jwtUtil.createdJwt(username, role, 60 * 60 * 60L);
+        String token = jwtUtil.createdJwt(username, role, 60 * 60 * 60 * 60L);
 
         response.addCookie(createCookie("Authorization", token));
         response.sendRedirect("http://localhost:3000");
@@ -41,6 +44,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Cookie cookie = new Cookie(key, value);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
+        cookie.setMaxAge(60 * 60 * 60 * 60);
 
         return cookie;
     }

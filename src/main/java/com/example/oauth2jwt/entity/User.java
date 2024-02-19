@@ -9,7 +9,6 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-@EqualsAndHashCode(of = "id")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
